@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">DicodingNotesApp</string>
+    <string name="create_new">Create New</string>
+    <string name="delete">Delete</string>
+    <string name="title">Title</string>
+    <string name="description">Description</string>
+    <string name="submit">Submit</string>
+</resources>

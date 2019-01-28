@@ -1,6 +1,7 @@
 package id.topapp.radinaldn.mynotesapp.activity;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -19,6 +20,8 @@ import id.topapp.radinaldn.mynotesapp.adapter.NoteAdapter;
 import id.topapp.radinaldn.mynotesapp.db.NoteHelper;
 import id.topapp.radinaldn.mynotesapp.model.Note;
 
+import static id.topapp.radinaldn.mynotesapp.db.DatabaseContract.CONTENT_URI;
+
 public class MainActivity extends AppCompatActivity
 implements View.OnClickListener{
 
@@ -26,9 +29,11 @@ implements View.OnClickListener{
     ProgressBar progressBar;
     FloatingActionButton fabAdd;
 
-    private LinkedList<Note> list;
+
     private NoteAdapter adapter;
     private NoteHelper noteHelper;
+
+    private Cursor list;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +53,7 @@ implements View.OnClickListener{
         noteHelper = new NoteHelper(this);
         noteHelper.open();
 
-        list = new LinkedList<>();
+
 
         adapter = new NoteAdapter(this);
         adapter.setListNotes(list);
@@ -71,33 +76,30 @@ implements View.OnClickListener{
         }
     }
 
-    private class LoadNoteAsync extends AsyncTask<Void, Void, ArrayList<Note>>{
+    private class LoadNoteAsync extends AsyncTask<Void, Void, Cursor>{
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             progressBar.setVisibility(View.VISIBLE);
 
-            if (list.size() > 0){
-                list.clear();
-            }
         }
 
         @Override
-        protected ArrayList<Note> doInBackground(Void... voids) {
-            return noteHelper.query();
+        protected Cursor doInBackground(Void... voids) {
+            return getContentResolver().query(CONTENT_URI, null, null, null, null);
         }
 
         @Override
-        protected void onPostExecute(ArrayList<Note> notes) {
+        protected void onPostExecute(Cursor notes) {
             super.onPostExecute(notes);
             progressBar.setVisibility(View.GONE);
 
-            list.addAll(notes);
+            list = notes;
             adapter.setListNotes(list);
             adapter.notifyDataSetChanged();
 
-            if (list.size() == 0){
+            if (list.getCount() == 0){
                 showSnackbarMessage("No data");
             }
         }
@@ -114,13 +116,17 @@ implements View.OnClickListener{
 
 //                int position = data.getIntExtra(FormAddUpdateActivity.EXTRA_POSITION, 0);
 //                rvNotes.getLayoutManager().smoothScrollToPosition(rvNotes, new RecyclerView.State(), position);
-            } else if (resultCode == FormAddUpdateActivity.RESULT_DELETE){
+            } else if (requestCode == FormAddUpdateActivity.REQUEST_UPDATE){
 
-                int position = data.getIntExtra(FormAddUpdateActivity.EXTRA_POSITION, 0);
-                list.remove(position);
-                adapter.setListNotes(list);
-                adapter.notifyDataSetChanged();
-                showSnackbarMessage("One item has deleted successfuly");
+                if (resultCode == FormAddUpdateActivity.RESULT_UPDATE){
+                    new LoadNoteAsync().execute();
+                    showSnackbarMessage("One item has updated succesfuly");
+                }
+
+                else if (resultCode == FormAddUpdateActivity.RESULT_DELETE){
+                    new LoadNoteAsync().execute();
+                    showSnackbarMessage("One item has deleted succesfuly");
+                }
             }
         }
     }
@@ -129,9 +135,6 @@ implements View.OnClickListener{
     protected void onDestroy() {
         super.onDestroy();
 
-        if (noteHelper != null){
-            noteHelper.close();
-        }
     }
 
     private void showSnackbarMessage(String message) {

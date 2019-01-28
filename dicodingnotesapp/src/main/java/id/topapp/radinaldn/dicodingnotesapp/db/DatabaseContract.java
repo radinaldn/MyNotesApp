@@ -1,4 +1,4 @@
-package id.topapp.radinaldn.mynotesapp.db;
+package id.topapp.radinaldn.dicodingnotesapp.db;
 
 import android.database.Cursor;
 import android.net.Uri;

@@ -1,25 +1,20 @@
-package id.topapp.radinaldn.mynotesapp.model;
+package id.topapp.radinaldn.dicodingnotesapp.db;
 
 import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import id.topapp.radinaldn.mynotesapp.db.DatabaseContract;
-
-import static android.provider.BaseColumns._ID;
-import static id.topapp.radinaldn.mynotesapp.db.DatabaseContract.getColumnString;
-import static id.topapp.radinaldn.mynotesapp.db.DatabaseContract.getColumnInt;
+import static id.topapp.radinaldn.dicodingnotesapp.db.DatabaseContract.getColumnInt;
+import static id.topapp.radinaldn.dicodingnotesapp.db.DatabaseContract.getColumnString;
 
 /**
- * Created by radinaldn on 26/01/19.
+ * Created by radinaldn on 28/01/19.
  */
 
-public class Note implements Parcelable {
+public class NoteItem implements Parcelable {
 
     private int id;
-    private String title;
-    private String description;
-    private String date;
+    private String title, description, date;
 
     public int getId() {
         return id;
@@ -60,32 +55,39 @@ public class Note implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(title);
+        dest.writeString(description);
+        dest.writeString(date);
     }
 
-    public Note() {
+    public NoteItem() {
     }
 
-    // Untuk content provider
-    public Note(Cursor cursor) {
-        this.id = getColumnInt(cursor, _ID);
+    public NoteItem(Cursor cursor) {
+        this.id = getColumnInt(cursor, DatabaseContract.NoteColumn._ID);
         this.title = getColumnString(cursor, DatabaseContract.NoteColumn.TITLE);
         this.description = getColumnString(cursor, DatabaseContract.NoteColumn.DESCRIPTION);
         this.date = getColumnString(cursor, DatabaseContract.NoteColumn.DATE);
     }
-    // End Untuk content provider
 
-    protected Note(Parcel in) {
+    protected NoteItem(Parcel in) {
+        id = in.readInt();
+        title = in.readString();
+        description = in.readString();
+        date = in.readString();
     }
 
-    public static final Creator<Note> CREATOR = new Creator<Note>() {
+    public static final Parcelable.Creator<NoteItem> CREATOR = new
+            Creator<NoteItem>() {
         @Override
-        public Note createFromParcel(Parcel in) {
-            return new Note(in);
+        public NoteItem createFromParcel(Parcel in) {
+            return new NoteItem(in);
         }
 
         @Override
-        public Note[] newArray(int size) {
-            return new Note[size];
+        public NoteItem[] newArray(int size) {
+            return new NoteItem[size];
         }
     };
 }

@@ -2,6 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="id.topapp.radinaldn.mynotesapp">
 
+    <!-- Untuk kebutuhan content provider-->
+    <permission android:name="id.topapp.radinaldn.mynotesapp.READ_DATABASE"
+        android:protectionLevel="normal"/>
+    <permission android:name="id.topapp.radinaldn.mynotesapp.WRITE_DATABASE"
+        android:protectionLevel="normal"/>
+    <!-- End Untuk kebutuhan content provider-->
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -17,6 +24,16 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.FormAddUpdateActivity"></activity>
+
+        <!-- Untuk kebutuhan content provider-->
+        <provider
+            android:authorities="id.topapp.radinaldn.mynotesapp"
+            android:name=".provider.NoteProvider"
+            android:exported="true"
+            android:readPermission="id.topapp.radinaldn.mynotesapp.READ_DATABASE"
+            android:writePermission="id.topapp.radinaldn.mynotesapp.WRITE_DATABASE"/>
+        <!-- End Untuk kebutuhan content provider-->
+
     </application>
 
 </manifest>
